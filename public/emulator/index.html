@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gameboxd Emulator - Tetris</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: #0a1022;
+        overflow: hidden;
+      }
+
+      #controls {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        z-index: 9999;
+        display: flex;
+        gap: 8px;
+      }
+
+      #controls-guide {
+        position: fixed;
+        left: 10px;
+        bottom: 10px;
+        z-index: 9999;
+        width: min(360px, calc(100vw - 20px));
+        border: 1px solid rgba(142, 171, 255, 0.45);
+        border-radius: 10px;
+        background: rgba(10, 21, 46, 0.92);
+        color: #e6efff;
+        font: 13px/1.35 'Segoe UI', Tahoma, sans-serif;
+        overflow: hidden;
+      }
+
+      #controls-guide-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 8px 10px;
+        background: rgba(20, 35, 70, 0.95);
+      }
+
+      #controls-guide-header strong {
+        font-size: 13px;
+      }
+
+      #controls-guide-toggle {
+        border: 1px solid rgba(142, 171, 255, 0.45);
+        background: rgba(15, 27, 57, 0.85);
+        color: #e6efff;
+        border-radius: 6px;
+        padding: 4px 8px;
+        font: inherit;
+        cursor: pointer;
+      }
+
+      #controls-guide-body {
+        padding: 8px 10px 10px;
+      }
+
+      #controls-guide-body ul {
+        margin: 6px 0 0;
+        padding-left: 18px;
+      }
+
+      #controls-guide-body li {
+        margin-bottom: 4px;
+      }
+
+      #controls-guide.collapsed #controls-guide-body {
+        display: none;
+      }
+
+      .control-btn {
+        border: 1px solid rgba(142, 171, 255, 0.45);
+        background: rgba(15, 27, 57, 0.85);
+        color: #e6efff;
+        border-radius: 8px;
+        padding: 6px 10px;
+        font: 13px/1.2 'Segoe UI', Tahoma, sans-serif;
+        cursor: pointer;
+      }
+
+      .control-btn:hover {
+        background: rgba(29, 46, 92, 0.95);
+      }
+
+      #game {
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="controls">
+      <button class="control-btn" id="save-state" type="button">Save State</button>
+      <button class="control-btn" id="load-state" type="button">Load State</button>
+      <button class="control-btn" id="fullscreen" type="button">Fullscreen</button>
+    </div>
+
+    <section id="controls-guide" aria-label="Keyboard controls guide">
+      <div id="controls-guide-header">
+        <strong id="controls-guide-title">Controls Guide</strong>
+        <button id="controls-guide-toggle" type="button" aria-expanded="true">Hide</button>
+      </div>
+      <div id="controls-guide-body">
+        <p id="controls-guide-subtitle">Default keyboard controls:</p>
+        <ul id="controls-guide-list"></ul>
+      </div>
+    </section>
+
+    <div id="game"></div>
+    <script>
+      const params = new URLSearchParams(window.location.search)
+      const requestedRom = (params.get('rom') || 'Tetris (JUE) (V1.1) [!].gb').trim()
+      const hasUnsafePath = requestedRom.includes('..') || /[\\/]/.test(requestedRom)
+      const safeRom = requestedRom && !hasUnsafePath ? requestedRom : 'Tetris (JUE) (V1.1) [!].gb'
+      const gameTitle = (params.get('title') || 'Tetris').trim() || 'Tetris'
+
+      document.title = `Gameboxd Emulator - ${gameTitle}`
+
+      // Detect core based on file extension
+      const fileExtension = safeRom.split('.').pop().toLowerCase()
+      const coreMap = {
+        'nes': 'nes',
+        'gb': 'gb',
+        'gbc': 'gb',
+        'gba': 'gba',
+        'md': 'segaMD',
+        'gen': 'segaMD',
+        'smd': 'segaMD',
+        'sfc': 'snes',
+        'smc': 'snes',
+      }
+      const detectedCore = coreMap[fileExtension] || 'gb'
+
+      const getGuideEntries = (core) => {
+        const base = [
+          { action: 'Move / D-pad', key: 'Arrow Keys' },
+          { action: 'Start', key: 'Enter' },
+          { action: 'Select', key: 'Right Shift' },
+          { action: 'Primary Action', key: 'Z' },
+          { action: 'Secondary Action', key: 'X' },
+        ]
+
+        if (core === 'gba') {
+          return [...base, { action: 'L / R Shoulder', key: 'A / S' }]
+        }
+
+        if (core === 'segaMD') {
+          return [
+            { action: 'Move / D-pad', key: 'Arrow Keys' },
+            { action: 'Start', key: 'Enter' },
+            { action: 'A / B / C', key: 'Z / X / C' },
+          ]
+        }
+
+        if (core === 'snes') {
+          return [
+            { action: 'Move / D-pad', key: 'Arrow Keys' },
+            { action: 'Start', key: 'Enter' },
+            { action: 'Select', key: 'Right Shift' },
+            { action: 'A / B', key: 'Z / X' },
+            { action: 'X / Y', key: 'A / S' },
+            { action: 'L / R Shoulder', key: 'Q / W' },
+          ]
+        }
+
+        return base
+      }
+
+      const renderControlsGuide = () => {
+        const title = document.getElementById('controls-guide-title')
+        const subtitle = document.getElementById('controls-guide-subtitle')
+        const list = document.getElementById('controls-guide-list')
+
+        title.textContent = `${gameTitle} Controls Guide`
+        subtitle.textContent = `Default keyboard controls for ${detectedCore.toUpperCase()}:`
+
+        list.innerHTML = ''
+        getGuideEntries(detectedCore).forEach((entry) => {
+          const li = document.createElement('li')
+          li.innerHTML = `<strong>${entry.action}:</strong> ${entry.key}`
+          list.appendChild(li)
+        })
+      }
+
+      // EmulatorJS bootstrap settings must be declared before loader.js.
+      window.EJS_player = '#game'
+      window.EJS_core = detectedCore
+      window.EJS_gameUrl = `/roms/${safeRom}`
+      window.EJS_pathtodata = 'https://cdn.emulatorjs.org/stable/data/'
+
+      const SAVE_KEY = `gameboxd_${safeRom}_save_state`
+
+      const getEmulator = () => window.EJS_emulator || window.Module || null
+
+      const notify = (message) => {
+        console.log(`[Gameboxd Emulator] ${message}`)
+      }
+
+      const onSaveState = () => {
+        const emulator = getEmulator()
+        if (!emulator) {
+          notify('Emulator is not ready yet.')
+          return
+        }
+
+        try {
+          if (typeof emulator.saveState === 'function') {
+            const state = emulator.saveState()
+            if (state) {
+              localStorage.setItem(SAVE_KEY, JSON.stringify(state))
+              notify('State saved.')
+              return
+            }
+          }
+
+          if (typeof emulator.saveSavestate === 'function') {
+            emulator.saveSavestate()
+            notify('Save request sent to emulator.')
+            return
+          }
+
+          notify('Save state is not supported by this core build.')
+        } catch (error) {
+          notify(`Save failed: ${error.message}`)
+        }
+      }
+
+      const onLoadState = () => {
+        const emulator = getEmulator()
+        if (!emulator) {
+          notify('Emulator is not ready yet.')
+          return
+        }
+
+        try {
+          const raw = localStorage.getItem(SAVE_KEY)
+          if (raw && typeof emulator.loadState === 'function') {
+            emulator.loadState(JSON.parse(raw))
+            notify('State loaded.')
+            return
+          }
+
+          if (typeof emulator.loadSavestate === 'function') {
+            emulator.loadSavestate()
+            notify('Load request sent to emulator.')
+            return
+          }
+
+          notify('No saved state found or load state unsupported.')
+        } catch (error) {
+          notify(`Load failed: ${error.message}`)
+        }
+      }
+
+      const onFullscreen = async () => {
+        const target = document.documentElement
+        try {
+          if (document.fullscreenElement) {
+            await document.exitFullscreen()
+            return
+          }
+          await target.requestFullscreen()
+        } catch (error) {
+          notify(`Fullscreen failed: ${error.message}`)
+        }
+      }
+
+      window.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('save-state').addEventListener('click', onSaveState)
+        document.getElementById('load-state').addEventListener('click', onLoadState)
+        document.getElementById('fullscreen').addEventListener('click', onFullscreen)
+
+        renderControlsGuide()
+
+        const guide = document.getElementById('controls-guide')
+        const toggle = document.getElementById('controls-guide-toggle')
+        toggle.addEventListener('click', () => {
+          const collapsed = guide.classList.toggle('collapsed')
+          toggle.textContent = collapsed ? 'Show' : 'Hide'
+          toggle.setAttribute('aria-expanded', String(!collapsed))
+        })
+      })
+    </script>
+    <script src="https://cdn.emulatorjs.org/stable/data/loader.js"></script>
+  </body>
+</html>

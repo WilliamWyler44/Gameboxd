@@ -1,0 +1,15 @@
+/* Animations - these cannot be done purely inline */
+@keyframes loadingShimmer {
+  0% {
+    background-position: 100% 0;
+  }
+
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+/* Media Queries - handled via JS or kept here for responsive design */
+@media (max-width: 1260px) {
+  /* Media queries will be handled via JS state or component restructuring */
+}

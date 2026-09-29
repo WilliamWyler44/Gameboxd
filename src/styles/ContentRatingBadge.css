@@ -1,0 +1,221 @@
+/* Content Rating Badge & ESRB Box Styles */
+
+.cr-detail-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: rgba(15, 23, 42, 0.65);
+  border: 1px solid rgba(100, 200, 255, 0.15);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin: 14px 0 10px 0;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  transition: all 0.25s ease;
+}
+
+.cr-detail-container:hover {
+  border-color: rgba(100, 200, 255, 0.3);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+}
+
+.cr-detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 10px;
+}
+
+.cr-section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #94a3b8;
+}
+
+.cr-age-chip {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 999px;
+  letter-spacing: 0.3px;
+}
+
+.cr-detail-body {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+}
+
+/* Iconic ESRB Rating Block */
+.cr-esrb-block {
+  width: 72px;
+  min-width: 72px;
+  height: 98px;
+  background: #000000;
+  border: 2px solid #ffffff;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+}
+
+.cr-esrb-top {
+  background: #000;
+  color: #fff;
+  font-size: 8px;
+  font-weight: 900;
+  text-align: center;
+  padding: 2px 1px;
+  letter-spacing: 0.5px;
+  font-family: Arial, Helvetica, sans-serif;
+  border-bottom: 1px solid #fff;
+}
+
+.cr-esrb-symbol-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  color: #000;
+}
+
+.cr-esrb-symbol {
+  font-family: 'Impact', 'Arial Black', sans-serif;
+  font-size: 34px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -1px;
+  transform: scaleY(1.1);
+}
+
+.cr-esrb-symbol-small {
+  font-size: 24px;
+}
+
+.cr-esrb-bottom {
+  background: #000;
+  color: #fff;
+  font-size: 7px;
+  font-weight: 800;
+  text-align: center;
+  padding: 3px 1px;
+  line-height: 1.1;
+  letter-spacing: 0.2px;
+  text-transform: uppercase;
+  font-family: Arial, Helvetica, sans-serif;
+  border-top: 1px solid #fff;
+}
+
+.cr-detail-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cr-rating-title-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.cr-rating-label {
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+}
+
+.cr-rating-desc {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #cbd5e1;
+  margin: 0;
+}
+
+.cr-descriptors-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.cr-descriptor-pill {
+  font-size: 11px;
+  font-weight: 600;
+  color: #e2e8f0;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 3px 9px;
+  border-radius: 6px;
+}
+
+/* Compact Pill Badge for Meta row */
+.cr-inline-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease;
+}
+
+.cr-inline-badge:hover {
+  transform: translateY(-1px);
+}
+
+.cr-badge-code {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Impact', 'Arial Black', sans-serif;
+  font-size: 12px;
+  background: #000;
+  color: #fff;
+  padding: 1px 5px;
+  border-radius: 3px;
+  line-height: 1;
+}
+
+.cr-badge-text {
+  font-weight: 700;
+}
+
+/* Catalog Card Badge */
+.cr-catalog-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  border: 1px solid;
+}
+
+@media (max-width: 600px) {
+  .cr-detail-body {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .cr-rating-title-row {
+    justify-content: center;
+  }
+  .cr-descriptors-wrap {
+    justify-content: center;
+  }
+}

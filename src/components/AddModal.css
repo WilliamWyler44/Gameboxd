@@ -1,0 +1,44 @@
+.gb-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(5,10,24,0.7);
+  display: grid;
+  place-items: center;
+  z-index: 60;
+}
+.gb-modal {
+  width: min(820px, 94vw);
+  background: rgba(10,18,34,0.95);
+  border: 1px solid rgba(120,150,255,0.08);
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+}
+.gb-modal-header { display:flex; align-items:center; justify-content:space-between; gap:12px }
+.gb-modal-close { background:transparent; border:0; font-size:20px; color:#cfe0ff }
+.gb-modal-body { margin-top:8px }
+.gb-modal-grid { display:grid; grid-template-columns:160px 1fr; gap:12px; align-items:start }
+.gb-modal-cover { width:160px; height:220px; object-fit:cover; border-radius:8px; border:1px solid rgba(143,171,255,0.12) }
+.gb-modal-footer { display:flex; gap:8px; justify-content:flex-end; margin-top:12px }
+.gb-modal .error { color:#ffb4b4 }
+
+/* Status selector chips (scoped to modal) */
+.gb-modal .status-chip {
+  border: 1px solid rgba(148, 174, 255, 0.18);
+  background: rgba(31, 44, 77, 0.32);
+  color: #e6eef8;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+.gb-modal .status-chip.active {
+  background: linear-gradient(90deg, #5d66f8, #7e43f8);
+  border-color: rgba(143,171,255,0.9);
+  box-shadow: 0 8px 18px rgba(40,70,200,0.18);
+}
+.gb-modal .status-chip:focus-visible {
+  outline: 2px solid rgba(133,160,255,0.9);
+  outline-offset: 2px;
+}

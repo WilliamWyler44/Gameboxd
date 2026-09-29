@@ -1,0 +1,5 @@
+.star-rating{display:flex;gap:6px;align-items:center}
+.star-rating .star{background:transparent;border:none;color:rgba(237,242,255,0.35);cursor:pointer;padding:2px 4px;transition:color .12s, transform .08s}
+.star-rating .star.filled{color:#ffd166;transform:translateY(-2px);text-shadow:0 2px 6px rgba(0,0,0,0.4)}
+.star-rating .star.readonly{cursor:default}
+.star-rating .star:focus{outline:none;box-shadow:0 0 0 3px rgba(79,122,255,0.12);border-radius:4px}
